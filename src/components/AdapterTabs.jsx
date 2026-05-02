@@ -1,0 +1,84 @@
+import{useState}from'react'
+import{useAegisStore}from'../hooks/useAegisData'
+import{TRADING_STATS}from'../lib/mockData'
+function CircGaugeSm({val,color,size=76,label}){
+  const r=size/2-7,circ=2*Math.PI*r,dash=circ*val/100,gap=circ*(1-val/100)
+  return(
+    <div style={{position:'relative',width:size,height:size,flexShrink:0}}>
+      <svg width={size} height={size} style={{position:'absolute',top:0,left:0,overflow:'visible'}}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="4"/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="4.5" strokeDasharray={`${dash} ${gap}`} strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`} style={{filter:`drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px ${color}50)`,transition:'stroke-dasharray 1s ease'}}/>
+        <circle cx={size/2} cy={size/2} r={r+7} fill="none" stroke={`${color}15`} strokeWidth="1" strokeDasharray="3 7" style={{animation:'spinCW 10s linear infinite'}}/>
+      </svg>
+      <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+        <span style={{fontFamily:'var(--fd)',fontSize:15,fontWeight:700,color,textShadow:`0 0 12px ${color}80`,transition:'all .8s ease'}}>{Math.round(val)}</span>
+        {label&&<span style={{fontFamily:'var(--fd)',fontSize:5.5,color:`${color}55`,letterSpacing:1}}>{label}</span>}
+      </div>
+    </div>
+  )
+}
+function TradingContent(){
+  const{ticks}=useAegisStore()
+  const at=parseFloat((TRADING_STATS.acc_trend+Math.sin(ticks*.04)*.35).toFixed(1))
+  const av=parseFloat((TRADING_STATS.acc_vol+Math.sin(ticks*.05+1)*.4).toFixed(1))
+  return(
+    <div style={{display:'flex',gap:14,height:'100%',alignItems:'center'}}>
+      <div style={{display:'flex',gap:8,flexShrink:0}}>
+        <CircGaugeSm val={at} color="#00ff88" label="TREND"/>
+        <CircGaugeSm val={av} color="#00e5ff" label="VOLT"/>
+        <CircGaugeSm val={TRADING_STATS.acc_ovr} color="#ffaa00" label="OVRL"/>
+      </div>
+      <div style={{width:1,height:68,background:'rgba(0,160,90,.12)'}}/>
+      <div style={{display:'flex',gap:6,flex:1}}>
+        {[['TOTAL',TRADING_STATS.total,'#d0ecff'],['APPROVE',TRADING_STATS.approvals,'#00ff88'],['BLOCK',TRADING_STATS.blocks,'#ff2d78'],['HOLD',TRADING_STATS.holds,'#ffaa00']].map(([l,v,c])=>(
+          <div key={l} style={{background:'rgba(0,8,18,.7)',border:`1px solid ${c}18`,borderRadius:2,padding:'6px 8px',flex:1,textAlign:'center',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${c}50,transparent)`}}/>
+            <div style={{fontFamily:'var(--fd)',fontSize:5.5,letterSpacing:2,color:'var(--dm)',marginBottom:2}}>{l}</div>
+            <div style={{fontFamily:'var(--fd)',fontSize:20,fontWeight:700,color:c,textShadow:`0 0 14px ${c}60`}}>{v}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{width:1,height:68,background:'rgba(0,160,90,.12)'}}/>
+      <div style={{minWidth:108,display:'flex',flexDirection:'column',gap:5}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>AEGIS EFFECT</div>
+        <div style={{background:'rgba(0,255,136,.03)',border:'1px solid rgba(0,255,136,.15)',borderRadius:2,padding:'5px 8px',textAlign:'center',position:'relative',overflow:'hidden',animation:'nodeGlow 3s ease-in-out infinite'}}>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent,rgba(0,255,136,.4),transparent)'}}/>
+          <div style={{fontFamily:'var(--fm)',fontSize:10,color:'#00ff88',textShadow:'0 0 10px rgba(0,255,136,.5)'}}>MEASURING</div>
+          <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',letterSpacing:1,marginTop:2}}>ACCUMULATING</div>
+        </div>
+        <div style={{fontFamily:'var(--fm)',fontSize:8,color:'var(--dm)',textAlign:'center'}}>61 matched</div>
+      </div>
+    </div>
+  )
+}
+function DormantContent({name}){
+  return(
+    <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',flexDirection:'column',gap:6}}>
+      <div style={{display:'flex',alignItems:'center',gap:8}}>
+        <div style={{width:7,height:7,borderRadius:'50%',background:'rgba(14,42,62,.4)',border:'1px solid rgba(14,42,62,.6)',animation:'pulseSoft 2s ease-in-out infinite'}}/>
+        <div style={{fontFamily:'var(--fd)',fontSize:9,letterSpacing:5,color:'rgba(14,42,62,.4)'}}>{name} ADAPTER</div>
+      </div>
+      <div style={{fontFamily:'var(--fm)',fontSize:8,color:'rgba(14,42,62,.3)'}}>DORMANT · QUEUED FOR LAYER 10 EXPANSION</div>
+    </div>
+  )
+}
+export function AdapterTabs(){
+  const[tab,setTab]=useState('trading')
+  return(
+    <div className="panel" style={{display:'flex',flexDirection:'column',overflow:'hidden'}}>
+      <div style={{display:'flex',alignItems:'stretch',borderBottom:'1px solid rgba(0,160,90,.1)',background:'rgba(0,0,0,.2)'}}>
+        <span style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:3,color:'var(--dm)',padding:'0 12px',display:'flex',alignItems:'center'}}>ADAPTERS</span>
+        {[['trading','TRADING',true],['dev','DEV',false],['ops','OPS',false],['fin','FIN',false],['support','SUPPORT',false]].map(([id,l,live])=>(
+          <button key={id} onClick={()=>live&&setTab(id)} style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:2,padding:'8px 12px',border:'none',borderBottom:tab===id?'2px solid #00ff88':'2px solid transparent',background:'transparent',color:tab===id?'#00ff88':live?'var(--dm)':'rgba(14,42,62,.4)',cursor:live?'pointer':'not-allowed',transition:'all .2s',display:'flex',alignItems:'center',gap:5,textShadow:tab===id?'0 0 8px rgba(0,255,136,.5)':'none'}}>
+            {l}
+            {live&&<span style={{width:4,height:4,borderRadius:'50%',background:'#00ff88',boxShadow:'0 0 5px #00ff88',display:'inline-block'}}/>}
+            {!live&&<span style={{fontFamily:'var(--fm)',fontSize:6,color:'rgba(14,42,62,.35)'}}>DORMANT</span>}
+          </button>
+        ))}
+      </div>
+      <div style={{flex:1,padding:'8px 12px 8px 14px',overflow:'hidden'}}>
+        {tab==='trading'?<TradingContent/>:<DormantContent name={tab.toUpperCase()}/>}
+      </div>
+    </div>
+  )
+}
