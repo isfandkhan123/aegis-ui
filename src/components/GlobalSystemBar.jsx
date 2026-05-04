@@ -1,8 +1,20 @@
 import{useAegisStore}from'../hooks/useAegisData'
 import{SYSTEM_INFO}from'../lib/mockData'
 export function GlobalSystemBar(){
-  const{time,latency}=useAegisStore()
-  const fields=[['STATUS',SYSTEM_INFO.status,'#00ff88'],['AUTONOMY',`TIER ${SYSTEM_INFO.autonomy}`,'#00e5ff'],['RISK',SYSTEM_INFO.risk,'#00ff88'],['SERVICES',`${SYSTEM_INFO.svc_on}/${SYSTEM_INFO.svc_tot} ONLINE`,'#00ff88'],['LATENCY',`${latency}ms`,'#6ea8c8'],['PHASE',SYSTEM_INFO.phase,'#cc44ff']]
+  const{time,latency,missionStatus}=useAegisStore()
+  const status  = missionStatus?.status   || SYSTEM_INFO.status
+  const risk    = missionStatus?.risk     || SYSTEM_INFO.risk
+  const svc_on  = missionStatus?.svc_on   ?? SYSTEM_INFO.svc_on
+  const svc_tot = missionStatus?.svc_tot  ?? SYSTEM_INFO.svc_tot
+  const phase   = missionStatus?.phase    || SYSTEM_INFO.phase
+  const fields=[
+    ['STATUS',   status,                           status==='ACTIVE'?'#00ff88':'#ffaa00'],
+    ['AUTONOMY', `TIER ${SYSTEM_INFO.autonomy}`,   '#00e5ff'],
+    ['RISK',     risk,                             risk==='NORMAL'?'#00ff88':risk==='ELEVATED'?'#ffaa00':'#ff2d78'],
+    ['SERVICES', `${svc_on}/${svc_tot} ONLINE`,    svc_on===svc_tot?'#00ff88':'#ffaa00'],
+    ['LATENCY',  `${latency}ms`,                   '#6ea8c8'],
+    ['PHASE',    phase,                            '#cc44ff'],
+  ]
   return(
     <div style={{background:'rgba(0,3,7,0.97)',border:'1px solid rgba(0,160,90,0.22)',borderRadius:3,display:'flex',alignItems:'center',padding:'0 14px',position:'relative',overflow:'hidden'}}>
       <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent,rgba(0,255,136,.65),rgba(0,229,255,.3),transparent)'}}/>

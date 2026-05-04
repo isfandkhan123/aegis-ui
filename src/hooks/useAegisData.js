@@ -3,7 +3,7 @@ import{create}from'zustand'
 import{INIT_DECISION,INIT_HISTORY,INIT_AGENTS,MODULES,makeDecision}from'../lib/mockData'
 export const useAegisStore=create((set,get)=>({
   decision:INIT_DECISION,history:INIT_HISTORY,agents:INIT_AGENTS,
-  ticks:0,flashModId:null,confDisplay:82,latency:42,
+  ticks:0,flashModId:null,confDisplay:82,latency:42,missionStatus:null,
   time:new Date().toLocaleTimeString('en-GB',{hour12:false}),
   liveSignals:[],
   liveConnected:false,
@@ -21,6 +21,7 @@ export const useAegisStore=create((set,get)=>({
   stepAgents(){set(s=>({agents:s.agents.map(a=>{const n=a.prog+(1.2+Math.random()*1.8);return{...a,prog:n>99?4:n}})}))},
   randomFlash(){const acts=MODULES.filter(m=>m.st==='active').map(m=>m.id);get().flashMod(acts[Math.floor(Math.random()*acts.length)])},
   setLiveSignals(signals){set({liveSignals:signals,liveConnected:true})},
+  setMissionStatus(data){set({missionStatus:data,latency:data.latency_ms||42})},
 }))
 export function useMockTimers(){
   const s=useAegisStore()
@@ -43,6 +44,21 @@ export function useLiveSignals(){
     }
     poll()
     const t=setInterval(poll,5000)
+    return()=>clearInterval(t)
+  },[])
+}
+export function useMissionStatus(){
+  const setMissionStatus=useAegisStore(s=>s.setMissionStatus)
+  useEffect(()=>{
+    const poll=async()=>{
+      try{
+        const base=import.meta.env.VITE_AEGIS_URL||''
+        const res=await fetch(`${base}/mission/control/status`)
+        if(res.ok){const data=await res.json();if(data.ok)setMissionStatus(data)}
+      }catch(e){}
+    }
+    poll()
+    const t=setInterval(poll,10000)
     return()=>clearInterval(t)
   },[])
 }

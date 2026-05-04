@@ -1,4 +1,4 @@
-import{useMockTimers,useLiveSignals}from'./hooks/useAegisData'
+import{useMockTimers,useLiveSignals,useMissionStatus}from'./hooks/useAegisData'
 import{BackgroundLayers}from'./components/BackgroundLayers'
 import{GlobalSystemBar}from'./components/GlobalSystemBar'
 import{ModuleNodes}from'./components/ModuleNodes'
@@ -11,6 +11,7 @@ import{OperatorCommandBar}from'./components/OperatorCommandBar'
 export default function App(){
   useMockTimers()
   useLiveSignals()
+  useMissionStatus()
   return(
     <>
       <BackgroundLayers/>
