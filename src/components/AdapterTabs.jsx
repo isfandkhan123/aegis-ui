@@ -281,13 +281,161 @@ function FinContent() {
     </div>
   )
 }
+function SupportContent() {
+  const MOCK = [
+    { action: 'respond to ticket', target: 'ticket:4821', decision: 'APPROVE', risk: 'LOW', ts: '15:30' },
+    { action: 'escalate ticket', target: 'ticket:4820', decision: 'HOLD', risk: 'MEDIUM', ts: '14:15' },
+    { action: 'issue refund', target: 'customer:8821', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '13:00' },
+    { action: 'ban user', target: 'user:44821', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '11:45' },
+  ]
+  const dC = v => v==='APPROVE'?'#00ff88':v==='BLOCK'?'#ff2d78':v==='HOLD'?'#ffaa00':'#cc44ff'
+  return (
+    <div style={{display:'flex',gap:14,height:'100%',alignItems:'flex-start',paddingTop:4}}>
+      <div style={{minWidth:110,display:'flex',flexDirection:'column',gap:5}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>POLICY</div>
+        {[['RESPONSE','conf ≥ 0.80','#00ff88'],['REFUND ≥$500','OPERATOR REQ','#cc44ff'],['BAN/DELETE','OPERATOR REQ','#ff2d78']].map(([l,v,c])=>(
+          <div key={l} style={{background:'rgba(0,8,18,0.7)',border:`1px solid ${c}18`,borderRadius:2,padding:'4px 7px'}}>
+            <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginBottom:1}}>{l}</div>
+            <div style={{fontFamily:'var(--fm)',fontSize:7,color:c}}>{v}</div>
+          </div>
+        ))}
+        <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginTop:2,letterSpacing:1}}>sa1_v1</div>
+      </div>
+      <div style={{width:1,height:100,background:'rgba(0,160,90,0.12)',marginTop:4}}/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>RECENT GOVERNED ACTIONS</div>
+        {MOCK.map((a,i)=>(
+          <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 8px',background:'rgba(0,8,18,0.7)',border:`1px solid ${dC(a.decision)}18`,borderRadius:2,position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${dC(a.decision)}30,transparent)`}}/>
+            <span style={{fontFamily:'var(--fm)',fontSize:7.5,color:'var(--dm)',width:32}}>{a.ts}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8.5,color:'var(--tx)',flex:1}}>{a.action}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8,color:'rgba(110,168,200,0.5)',flex:1}}>{a.target}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:6,color:a.risk==='HIGH'?'#ff2d78':a.risk==='MEDIUM'?'#ffaa00':'#00ff88',width:44}}>{a.risk}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:7.5,color:dC(a.decision),textShadow:`0 0 6px ${dC(a.decision)}50`,width:66,textAlign:'right'}}>{a.decision}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+function LegalContent() {
+  const MOCK = [
+    { action: 'review nda', target: 'counterparty:Google', decision: 'APPROVE', risk: 'LOW', ts: '16:00' },
+    { action: 'sign contract', target: 'contract:SaaS-001', decision: 'OPERATOR_REQUIRED', risk: 'MEDIUM', ts: '14:30' },
+    { action: 'regulatory filing', target: 'SEC:Form-D', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '12:00' },
+    { action: 'initiate litigation', target: 'entity:AcmeCorp', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '09:00' },
+  ]
+  const dC = v => v==='APPROVE'?'#00ff88':v==='BLOCK'?'#ff2d78':v==='HOLD'?'#ffaa00':'#cc44ff'
+  return (
+    <div style={{display:'flex',gap:14,height:'100%',alignItems:'flex-start',paddingTop:4}}>
+      <div style={{minWidth:110,display:'flex',flexDirection:'column',gap:5}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>POLICY</div>
+        {[['CONTRACT SIGN','OPERATOR REQ','#cc44ff'],['LITIGATION','OPERATOR REQ','#ff2d78'],['CROSS BORDER','OPERATOR REQ','#ff2d78'],['NDA REVIEW','Standard','#00ff88']].map(([l,v,c])=>(
+          <div key={l} style={{background:'rgba(0,8,18,0.7)',border:`1px solid ${c}18`,borderRadius:2,padding:'4px 7px'}}>
+            <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginBottom:1}}>{l}</div>
+            <div style={{fontFamily:'var(--fm)',fontSize:7,color:c}}>{v}</div>
+          </div>
+        ))}
+        <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginTop:2,letterSpacing:1}}>la1_v1</div>
+      </div>
+      <div style={{width:1,height:100,background:'rgba(0,160,90,0.12)',marginTop:4}}/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>RECENT GOVERNED ACTIONS</div>
+        {MOCK.map((a,i)=>(
+          <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 8px',background:'rgba(0,8,18,0.7)',border:`1px solid ${dC(a.decision)}18`,borderRadius:2,position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${dC(a.decision)}30,transparent)`}}/>
+            <span style={{fontFamily:'var(--fm)',fontSize:7.5,color:'var(--dm)',width:32}}>{a.ts}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8.5,color:'var(--tx)',flex:1}}>{a.action}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8,color:'rgba(110,168,200,0.5)',flex:1}}>{a.target}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:6,color:a.risk==='HIGH'?'#ff2d78':a.risk==='MEDIUM'?'#ffaa00':'#00ff88',width:44}}>{a.risk}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:7.5,color:dC(a.decision),textShadow:`0 0 6px ${dC(a.decision)}50`,width:66,textAlign:'right'}}>{a.decision}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+function SecurityContent() {
+  const MOCK = [
+    { action: 'scan endpoints', target: 'api.aegis.dev', decision: 'APPROVE', risk: 'MEDIUM', ts: '17:00' },
+    { action: 'vulnerability scan', target: 'auth.aegis.dev', decision: 'APPROVE', risk: 'MEDIUM', ts: '15:45' },
+    { action: 'simulate attack', target: 'api.aegis.dev', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '14:20' },
+    { action: 'exploit vulnerability', target: 'any', decision: 'BLOCK', risk: 'HIGH', ts: '13:00' },
+  ]
+  const dC = v => v==='APPROVE'?'#00ff88':v==='BLOCK'?'#ff2d78':v==='HOLD'?'#ffaa00':'#cc44ff'
+  return (
+    <div style={{display:'flex',gap:14,height:'100%',alignItems:'flex-start',paddingTop:4}}>
+      <div style={{minWidth:110,display:'flex',flexDirection:'column',gap:5}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>POLICY</div>
+        {[['EXPLOITATION','ALWAYS BLOCK','#ff2d78'],['SIMULATION','OPERATOR REQ','#cc44ff'],['PROD ENV','ALWAYS BLOCK','#ff2d78'],['SCAN HIGH','OPERATOR REQ','#ffaa00']].map(([l,v,c])=>(
+          <div key={l} style={{background:'rgba(0,8,18,0.7)',border:`1px solid ${c}18`,borderRadius:2,padding:'4px 7px'}}>
+            <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginBottom:1}}>{l}</div>
+            <div style={{fontFamily:'var(--fm)',fontSize:7,color:c}}>{v}</div>
+          </div>
+        ))}
+        <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginTop:2,letterSpacing:1}}>sea1_v1</div>
+      </div>
+      <div style={{width:1,height:100,background:'rgba(0,160,90,0.12)',marginTop:4}}/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>RECENT GOVERNED ACTIONS</div>
+        {MOCK.map((a,i)=>(
+          <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 8px',background:'rgba(0,8,18,0.7)',border:`1px solid ${dC(a.decision)}18`,borderRadius:2,position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${dC(a.decision)}30,transparent)`}}/>
+            <span style={{fontFamily:'var(--fm)',fontSize:7.5,color:'var(--dm)',width:32}}>{a.ts}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8.5,color:'var(--tx)',flex:1}}>{a.action}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8,color:'rgba(110,168,200,0.5)',flex:1}}>{a.target}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:6,color:a.risk==='HIGH'?'#ff2d78':a.risk==='MEDIUM'?'#ffaa00':'#00ff88',width:44}}>{a.risk}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:7.5,color:dC(a.decision),textShadow:`0 0 6px ${dC(a.decision)}50`,width:66,textAlign:'right'}}>{a.decision}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+function GrowthContent() {
+  const MOCK = [
+    { action: 'view analytics', target: 'campaign:Q2', decision: 'APPROVE', risk: 'LOW', ts: '17:30' },
+    { action: 'run ab test', target: 'landing:v2', decision: 'APPROVE', risk: 'MEDIUM', ts: '16:00' },
+    { action: 'launch campaign', target: 'campaign:ProductHunt', decision: 'OPERATOR_REQUIRED', risk: 'MEDIUM', ts: '14:00' },
+    { action: 'send email blast', target: 'list:50k', decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '11:00' },
+  ]
+  const dC = v => v==='APPROVE'?'#00ff88':v==='BLOCK'?'#ff2d78':v==='HOLD'?'#ffaa00':'#cc44ff'
+  return (
+    <div style={{display:'flex',gap:14,height:'100%',alignItems:'flex-start',paddingTop:4}}>
+      <div style={{minWidth:110,display:'flex',flexDirection:'column',gap:5}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>POLICY</div>
+        {[['CAMPAIGN ≥$500','OPERATOR REQ','#cc44ff'],['EMAIL 10k+','OPERATOR REQ','#ff2d78'],['BRAND RISK','OPERATOR REQ','#ffaa00'],['AD SPEND 20k+','OPERATOR REQ','#ff2d78']].map(([l,v,c])=>(
+          <div key={l} style={{background:'rgba(0,8,18,0.7)',border:`1px solid ${c}18`,borderRadius:2,padding:'4px 7px'}}>
+            <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginBottom:1}}>{l}</div>
+            <div style={{fontFamily:'var(--fm)',fontSize:7,color:c}}>{v}</div>
+          </div>
+        ))}
+        <div style={{fontFamily:'var(--fd)',fontSize:5.5,color:'var(--dm)',marginTop:2,letterSpacing:1}}>ga1_v1</div>
+      </div>
+      <div style={{width:1,height:100,background:'rgba(0,160,90,0.12)',marginTop:4}}/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
+        <div style={{fontFamily:'var(--fd)',fontSize:6,letterSpacing:2,color:'var(--dm)'}}>RECENT GOVERNED ACTIONS</div>
+        {MOCK.map((a,i)=>(
+          <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'4px 8px',background:'rgba(0,8,18,0.7)',border:`1px solid ${dC(a.decision)}18`,borderRadius:2,position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${dC(a.decision)}30,transparent)`}}/>
+            <span style={{fontFamily:'var(--fm)',fontSize:7.5,color:'var(--dm)',width:32}}>{a.ts}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8.5,color:'var(--tx)',flex:1}}>{a.action}</span>
+            <span style={{fontFamily:'var(--fm)',fontSize:8,color:'rgba(110,168,200,0.5)',flex:1}}>{a.target}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:6,color:a.risk==='HIGH'?'#ff2d78':a.risk==='MEDIUM'?'#ffaa00':'#00ff88',width:44}}>{a.risk}</span>
+            <span style={{fontFamily:'var(--fd)',fontSize:7.5,color:dC(a.decision),textShadow:`0 0 6px ${dC(a.decision)}50`,width:66,textAlign:'right'}}>{a.decision}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 export function AdapterTabs(){
   const[tab,setTab]=useState('trading')
   return(
     <div className="panel" style={{display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <div style={{display:'flex',alignItems:'stretch',borderBottom:'1px solid rgba(0,160,90,.1)',background:'rgba(0,0,0,.2)'}}>
         <span style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:3,color:'var(--dm)',padding:'0 12px',display:'flex',alignItems:'center'}}>ADAPTERS</span>
-        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',true],['support','SUPPORT',false]].map(([id,l,live])=>(
+        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',true],['support','SUPPORT',true],['legal','LEGAL',true],['security','SECURITY',true],['growth','GROWTH',true]].map(([id,l,live])=>(
           <button key={id} onClick={()=>live&&setTab(id)} style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:2,padding:'8px 12px',border:'none',borderBottom:tab===id?'2px solid #00ff88':'2px solid transparent',background:'transparent',color:tab===id?'#00ff88':live?'var(--dm)':'rgba(14,42,62,.4)',cursor:live?'pointer':'not-allowed',transition:'all .2s',display:'flex',alignItems:'center',gap:5,textShadow:tab===id?'0 0 8px rgba(0,255,136,.5)':'none'}}>
             {l}
             {live&&<span style={{width:4,height:4,borderRadius:'50%',background:'#00ff88',boxShadow:'0 0 5px #00ff88',display:'inline-block'}}/>}
@@ -296,7 +444,7 @@ export function AdapterTabs(){
         ))}
       </div>
       <div style={{flex:1,padding:'8px 12px 8px 14px',overflow:'hidden'}}>
-        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:tab==='fin'?<FinContent/>:<DormantContent name={tab.toUpperCase()}/>}
+        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:tab==='fin'?<FinContent/>:tab==='support'?<SupportContent/>:tab==='legal'?<LegalContent/>:tab==='security'?<SecurityContent/>:tab==='growth'?<GrowthContent/>:<DormantContent name={tab.toUpperCase()}/>}
       </div>
     </div>
   )
