@@ -219,13 +219,75 @@ function OpsContent() {
     </div>
   )
 }
+function FinContent() {
+  const MOCK_FIN = [
+    { action: 'approve expense', target: 'vendor:AWS', amount: 4500, decision: 'APPROVE', risk: 'MEDIUM', ts: '13:30' },
+    { action: 'release payment', target: 'vendor:Stripe', amount: 12000, decision: 'HOLD', risk: 'MEDIUM', ts: '11:15' },
+    { action: 'wire transfer', target: 'bank:HSBC', amount: 85000, decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '10:00' },
+    { action: 'freeze account', target: 'account:ops', amount: 0, decision: 'OPERATOR_REQUIRED', risk: 'HIGH', ts: '09:22' },
+    { action: 'view balance', target: 'account:main', amount: 0, decision: 'APPROVE', risk: 'LOW', ts: '08:45' },
+  ]
+
+  const dC = v => v === 'APPROVE' ? '#00ff88' : v === 'BLOCK' ? '#ff2d78' : v === 'HOLD' ? '#ffaa00' : '#cc44ff'
+  const fmt = n => n >= 1000 ? `$${(n/1000).toFixed(0)}k` : n > 0 ? `$${n}` : '—'
+
+  return (
+    <div style={{ display: 'flex', gap: 14, height: '100%', alignItems: 'flex-start', paddingTop: 4 }}>
+      {/* Policy info */}
+      <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ fontFamily: 'var(--fd)', fontSize: 6, letterSpacing: 2, color: 'var(--dm)' }}>POLICY</div>
+        <div style={{ background: 'rgba(0,8,18,0.7)', border: '1px solid rgba(0,255,136,0.15)', borderRadius: 2, padding: '6px 8px' }}>
+          <div style={{ fontFamily: 'var(--fd)', fontSize: 5.5, color: 'var(--dm)', marginBottom: 6, letterSpacing: 1 }}>THRESHOLDS</div>
+          {[['LOW', '<$1k', '#00ff88'], ['MEDIUM', '$1k-$50k', '#ffaa00'], ['HIGH', '>$50k', '#ff2d78']].map(([l, v, c]) => (
+            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+              <span style={{ fontFamily: 'var(--fd)', fontSize: 6, color: c }}>{l}</span>
+              <span style={{ fontFamily: 'var(--fm)', fontSize: 7.5, color: 'rgba(110,168,200,0.5)' }}>{v}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontFamily: 'var(--fd)', fontSize: 5.5, color: 'var(--dm)', letterSpacing: 1 }}>fa1_v1 · fin_policy_v1</div>
+      </div>
+
+      <div style={{ width: 1, height: 100, background: 'rgba(0,160,90,0.12)', marginTop: 4 }} />
+
+      {/* Recent governed fin actions */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ fontFamily: 'var(--fd)', fontSize: 6, letterSpacing: 2, color: 'var(--dm)' }}>RECENT GOVERNED ACTIONS</div>
+        {MOCK_FIN.map((a, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px', background: 'rgba(0,8,18,0.7)', border: `1px solid ${dC(a.decision)}18`, borderRadius: 2, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg,transparent,${dC(a.decision)}30,transparent)` }} />
+            <span style={{ fontFamily: 'var(--fm)', fontSize: 7.5, color: 'var(--dm)', width: 32 }}>{a.ts}</span>
+            <span style={{ fontFamily: 'var(--fm)', fontSize: 8.5, color: 'var(--tx)', flex: 1 }}>{a.action}</span>
+            <span style={{ fontFamily: 'var(--fm)', fontSize: 8, color: 'rgba(110,168,200,0.5)', flex: 1 }}>{a.target}</span>
+            <span style={{ fontFamily: 'var(--fm)', fontSize: 8, color: '#ffaa00', width: 36, textAlign: 'right' }}>{fmt(a.amount)}</span>
+            <span style={{ fontFamily: 'var(--fd)', fontSize: 6, color: a.risk === 'HIGH' ? '#ff2d78' : a.risk === 'MEDIUM' ? '#ffaa00' : '#00ff88', width: 44 }}>{a.risk}</span>
+            <span style={{ fontFamily: 'var(--fd)', fontSize: 7.5, color: dC(a.decision), textShadow: `0 0 6px ${dC(a.decision)}50`, width: 66, textAlign: 'right' }}>{a.decision}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ width: 1, height: 100, background: 'rgba(0,160,90,0.12)', marginTop: 4 }} />
+
+      {/* Stats */}
+      <div style={{ minWidth: 90, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ fontFamily: 'var(--fd)', fontSize: 6, letterSpacing: 2, color: 'var(--dm)' }}>GOVERNANCE</div>
+        {[['APPROVE', 2, '#00ff88'], ['HOLD', 1, '#ffaa00'], ['OP REQ', 2, '#cc44ff']].map(([l, v, c]) => (
+          <div key={l} style={{ background: 'rgba(0,8,18,0.7)', border: `1px solid ${c}18`, borderRadius: 2, padding: '4px 8px', textAlign: 'center' }}>
+            <div style={{ fontFamily: 'var(--fd)', fontSize: 5.5, color: 'var(--dm)', marginBottom: 2 }}>{l}</div>
+            <div style={{ fontFamily: 'var(--fd)', fontSize: 18, fontWeight: 700, color: c, textShadow: `0 0 10px ${c}50` }}>{v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 export function AdapterTabs(){
   const[tab,setTab]=useState('trading')
   return(
     <div className="panel" style={{display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <div style={{display:'flex',alignItems:'stretch',borderBottom:'1px solid rgba(0,160,90,.1)',background:'rgba(0,0,0,.2)'}}>
         <span style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:3,color:'var(--dm)',padding:'0 12px',display:'flex',alignItems:'center'}}>ADAPTERS</span>
-        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',false],['support','SUPPORT',false]].map(([id,l,live])=>(
+        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',true],['support','SUPPORT',false]].map(([id,l,live])=>(
           <button key={id} onClick={()=>live&&setTab(id)} style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:2,padding:'8px 12px',border:'none',borderBottom:tab===id?'2px solid #00ff88':'2px solid transparent',background:'transparent',color:tab===id?'#00ff88':live?'var(--dm)':'rgba(14,42,62,.4)',cursor:live?'pointer':'not-allowed',transition:'all .2s',display:'flex',alignItems:'center',gap:5,textShadow:tab===id?'0 0 8px rgba(0,255,136,.5)':'none'}}>
             {l}
             {live&&<span style={{width:4,height:4,borderRadius:'50%',background:'#00ff88',boxShadow:'0 0 5px #00ff88',display:'inline-block'}}/>}
@@ -234,7 +296,7 @@ export function AdapterTabs(){
         ))}
       </div>
       <div style={{flex:1,padding:'8px 12px 8px 14px',overflow:'hidden'}}>
-        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:<DormantContent name={tab.toUpperCase()}/>}
+        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:tab==='fin'?<FinContent/>:<DormantContent name={tab.toUpperCase()}/>}
       </div>
     </div>
   )
