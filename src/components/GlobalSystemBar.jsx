@@ -1,3 +1,4 @@
+import{useState,useEffect}from'react'
 import{useAegisStore}from'../hooks/useAegisData'
 import{SYSTEM_INFO}from'../lib/mockData'
 export function GlobalSystemBar(){
@@ -7,11 +8,28 @@ export function GlobalSystemBar(){
   const svc_on  = missionStatus?.svc_on   ?? SYSTEM_INFO.svc_on
   const svc_tot = missionStatus?.svc_tot  ?? SYSTEM_INFO.svc_tot
   const phase   = missionStatus?.phase    || SYSTEM_INFO.phase
+  const [ledgerOk, setLedgerOk] = useState(false)
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const base = import.meta.env.VITE_AEGIS_URL || ''
+        const res = await fetch(`${base}/ledger/health`)
+        if (res.ok) {
+          const d = await res.json()
+          setLedgerOk(d.ok === true)
+        }
+      } catch(e) {}
+    }
+    check()
+    const t = setInterval(check, 15000)
+    return () => clearInterval(t)
+  }, [])
   const fields=[
     ['STATUS',   status,                           status==='ACTIVE'?'#00ff88':'#ffaa00'],
     ['AUTONOMY', `TIER ${SYSTEM_INFO.autonomy}`,   '#00e5ff'],
     ['RISK',     risk,                             risk==='NORMAL'?'#00ff88':risk==='ELEVATED'?'#ffaa00':'#ff2d78'],
     ['SERVICES', `${svc_on}/${svc_tot} ONLINE`,    svc_on===svc_tot?'#00ff88':'#ffaa00'],
+    ['LEDGER',   ledgerOk?'CHAIN VALID':'OFFLINE', ledgerOk?'#00ff88':'#ff2d78'],
     ['LATENCY',  `${latency}ms`,                   '#6ea8c8'],
     ['PHASE',    phase,                            '#cc44ff'],
   ]
