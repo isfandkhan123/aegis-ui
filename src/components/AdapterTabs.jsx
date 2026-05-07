@@ -1,6 +1,7 @@
 import{useState,useEffect}from'react'
 import{useAegisStore}from'../hooks/useAegisData'
 import{TRADING_STATS}from'../lib/mockData'
+import{LedgerPanel}from'./LedgerPanel'
 function CircGaugeSm({val,color,size=76,label}){
   const r=size/2-7,circ=2*Math.PI*r,dash=circ*val/100,gap=circ*(1-val/100)
   return(
@@ -435,16 +436,18 @@ export function AdapterTabs(){
     <div className="panel" style={{display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <div style={{display:'flex',alignItems:'stretch',borderBottom:'1px solid rgba(0,160,90,.1)',background:'rgba(0,0,0,.2)'}}>
         <span style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:3,color:'var(--dm)',padding:'0 12px',display:'flex',alignItems:'center'}}>ADAPTERS</span>
-        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',true],['support','SUPPORT',true],['legal','LEGAL',true],['security','SECURITY',true],['growth','GROWTH',true]].map(([id,l,live])=>(
+        {[['trading','TRADING',true],['dev','DEV',true],['ops','OPS',true],['fin','FIN',true],['support','SUPPORT',true],['legal','LEGAL',true],['security','SECURITY',true],['growth','GROWTH',true],['ledger','LEDGER',true]].map(([id,l,live])=>{
+          const dotColor=id==='ledger'?'#00d4ff':'#00ff88'
+          return(
           <button key={id} onClick={()=>live&&setTab(id)} style={{fontFamily:'var(--fd)',fontSize:7,letterSpacing:2,padding:'8px 12px',border:'none',borderBottom:tab===id?'2px solid #00ff88':'2px solid transparent',background:'transparent',color:tab===id?'#00ff88':live?'var(--dm)':'rgba(14,42,62,.4)',cursor:live?'pointer':'not-allowed',transition:'all .2s',display:'flex',alignItems:'center',gap:5,textShadow:tab===id?'0 0 8px rgba(0,255,136,.5)':'none'}}>
             {l}
-            {live&&<span style={{width:4,height:4,borderRadius:'50%',background:'#00ff88',boxShadow:'0 0 5px #00ff88',display:'inline-block'}}/>}
+            {live&&<span style={{width:4,height:4,borderRadius:'50%',background:dotColor,boxShadow:`0 0 5px ${dotColor}`,display:'inline-block'}}/>}
             {!live&&<span style={{fontFamily:'var(--fm)',fontSize:6,color:'rgba(14,42,62,.35)'}}>DORMANT</span>}
           </button>
-        ))}
+        )})}
       </div>
       <div style={{flex:1,padding:'8px 12px 8px 14px',overflow:'hidden'}}>
-        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:tab==='fin'?<FinContent/>:tab==='support'?<SupportContent/>:tab==='legal'?<LegalContent/>:tab==='security'?<SecurityContent/>:tab==='growth'?<GrowthContent/>:<DormantContent name={tab.toUpperCase()}/>}
+        {tab==='trading'?<TradingContent/>:tab==='dev'?<DevContent/>:tab==='ops'?<OpsContent/>:tab==='fin'?<FinContent/>:tab==='support'?<SupportContent/>:tab==='legal'?<LegalContent/>:tab==='security'?<SecurityContent/>:tab==='growth'?<GrowthContent/>:tab==='ledger'?<LedgerPanel/>:<DormantContent name={tab.toUpperCase()}/>}
       </div>
     </div>
   )

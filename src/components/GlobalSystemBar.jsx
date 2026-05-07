@@ -1,14 +1,16 @@
 import{useState,useEffect}from'react'
 import{useAegisStore}from'../hooks/useAegisData'
 import{SYSTEM_INFO}from'../lib/mockData'
+import{normalizeVerificationDepth,verificationDepthColor,proofStatusColor}from'../utils/ledgerUtils'
 export function GlobalSystemBar(){
-  const{time,latency,missionStatus}=useAegisStore()
+  const{time,latency,missionStatus,latestCheckpoint,proofStatus,checkpointFetchedAt}=useAegisStore()
   const status  = missionStatus?.status   || SYSTEM_INFO.status
   const risk    = missionStatus?.risk     || SYSTEM_INFO.risk
   const svc_on  = missionStatus?.svc_on   ?? SYSTEM_INFO.svc_on
   const svc_tot = missionStatus?.svc_tot  ?? SYSTEM_INFO.svc_tot
   const phase   = missionStatus?.phase    || SYSTEM_INFO.phase
   const [ledgerOk, setLedgerOk] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const check = async () => {
       try {
@@ -17,21 +19,36 @@ export function GlobalSystemBar(){
         if (res.ok) {
           const d = await res.json()
           setLedgerOk(d.ok === true)
+        } else {
+          setLedgerOk(false)
         }
-      } catch(e) {}
+      } catch { setLedgerOk(false) }
     }
     check()
     const t = setInterval(check, 15000)
     return () => clearInterval(t)
   }, [])
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 5000)
+    return () => clearInterval(t)
+  }, [])
+  const integrityRaw='presence_only'
+  const integrityLabel=normalizeVerificationDepth(integrityRaw)
+  const integrityColor=verificationDepthColor(integrityRaw)
+  const stale=checkpointFetchedAt && (now-checkpointFetchedAt)>90000
+  const cpLabel=!latestCheckpoint?'NONE':stale?'STALE':(latestCheckpoint.date||'—')
+  const cpColor=!latestCheckpoint||stale?'#f59e0b':'#00d4ff'
   const fields=[
-    ['STATUS',   status,                           status==='ACTIVE'?'#00ff88':'#ffaa00'],
-    ['AUTONOMY', `TIER ${SYSTEM_INFO.autonomy}`,   '#00e5ff'],
-    ['RISK',     risk,                             risk==='NORMAL'?'#00ff88':risk==='ELEVATED'?'#ffaa00':'#ff2d78'],
-    ['SERVICES', `${svc_on}/${svc_tot} ONLINE`,    svc_on===svc_tot?'#00ff88':'#ffaa00'],
-    ['LEDGER',   ledgerOk?'CHAIN VALID':'OFFLINE', ledgerOk?'#00ff88':'#ff2d78'],
-    ['LATENCY',  `${latency}ms`,                   '#6ea8c8'],
-    ['PHASE',    phase,                            '#cc44ff'],
+    ['STATUS',     status,                            status==='ACTIVE'?'#00ff88':'#ffaa00'],
+    ['AUTONOMY',   `TIER ${SYSTEM_INFO.autonomy}`,    '#00e5ff'],
+    ['RISK',       risk,                              risk==='NORMAL'?'#00ff88':risk==='ELEVATED'?'#ffaa00':'#ff2d78'],
+    ['SERVICES',   `${svc_on}/${svc_tot} ONLINE`,     svc_on===svc_tot?'#00ff88':'#ffaa00'],
+    ['LEDGER',     ledgerOk?'CHAIN VALID':'OFFLINE',  ledgerOk?'#00ff88':'#ef4444'],
+    ['INTEGRITY',  integrityLabel,                    integrityColor],
+    ['CHECKPOINT', cpLabel,                           cpColor],
+    ['PROOF STATE',proofStatus,                       proofStatusColor(proofStatus)],
+    ['LATENCY',    `${latency}ms`,                    '#6ea8c8'],
+    ['PHASE',      phase,                             '#cc44ff'],
   ]
   return(
     <div style={{background:'rgba(0,3,7,0.97)',border:'1px solid rgba(0,160,90,0.22)',borderRadius:3,display:'flex',alignItems:'center',padding:'0 14px',position:'relative',overflow:'hidden'}}>

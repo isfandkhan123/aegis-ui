@@ -1,12 +1,16 @@
 import{useEffect}from'react'
 import{create}from'zustand'
 import{INIT_DECISION,INIT_HISTORY,INIT_AGENTS,MODULES,makeDecision}from'../lib/mockData'
+import{computeProofStatus}from'../utils/ledgerUtils'
 export const useAegisStore=create((set,get)=>({
   decision:INIT_DECISION,history:INIT_HISTORY,agents:INIT_AGENTS,
   ticks:0,flashModId:null,confDisplay:82,latency:42,missionStatus:null,
   time:new Date().toLocaleTimeString('en-GB',{hour12:false}),
   liveSignals:[],
   liveConnected:false,
+  latestCheckpoint:null,
+  proofStatus:'LEDGER_ONLY',
+  checkpointFetchedAt:null,
   tick(){set(s=>({ticks:s.ticks+1,time:new Date().toLocaleTimeString('en-GB',{hour12:false})}))},
   randomizeLatency(){set({latency:36+Math.floor(Math.random()*14)})},
   stepConf(){set(s=>{const target=s.decision.conf*100,diff=target-s.confDisplay;return{confDisplay:Math.abs(diff)<.1?target:s.confDisplay+diff*.09}})},
@@ -22,6 +26,13 @@ export const useAegisStore=create((set,get)=>({
   randomFlash(){const acts=MODULES.filter(m=>m.st==='active').map(m=>m.id);get().flashMod(acts[Math.floor(Math.random()*acts.length)])},
   setLiveSignals(signals){set({liveSignals:signals,liveConnected:true})},
   setMissionStatus(data){set({missionStatus:data,latency:data.latency_ms||42})},
+  setLedgerStatus(checkpoint){
+    if(checkpoint){
+      set({latestCheckpoint:checkpoint,proofStatus:computeProofStatus(checkpoint),checkpointFetchedAt:Date.now()})
+    }else{
+      set({latestCheckpoint:null,proofStatus:'LEDGER_ONLY'})
+    }
+  },
 }))
 export function useMockTimers(){
   const s=useAegisStore()
@@ -61,4 +72,26 @@ export function useMissionStatus(){
     const t=setInterval(poll,10000)
     return()=>clearInterval(t)
   },[])
+}
+export function useLedgerStatus(){
+  const setLedgerStatus=useAegisStore(s=>s.setLedgerStatus)
+  useEffect(()=>{
+    const poll=async()=>{
+      try{
+        const base=import.meta.env.VITE_AEGIS_URL||''
+        const res=await fetch(`${base}/ledger/checkpoints/latest`)
+        if(res.ok){
+          const data=await res.json()
+          if(data&&data.root_hash){setLedgerStatus(data)}
+          else if(data&&data.checkpoint&&data.checkpoint.root_hash){setLedgerStatus(data.checkpoint)}
+          else{setLedgerStatus(null)}
+        }else{
+          setLedgerStatus(null)
+        }
+      }catch{setLedgerStatus(null)}
+    }
+    poll()
+    const t=setInterval(poll,30000)
+    return()=>clearInterval(t)
+  },[setLedgerStatus])
 }
